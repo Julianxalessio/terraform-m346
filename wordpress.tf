@@ -1,6 +1,6 @@
 resource "aws_launch_template" "wordpress-ec2" {
   name_prefix   = "wordpress-ec2-"
-  image_id      = "ami-0abcdef1234567890" # z.B. Amazon Linux 2023 AMI
+  image_id      = data.aws_ami.al2023.id
   instance_type = "t3.micro"
 
   user_data= <<EOT
@@ -34,6 +34,22 @@ resource "aws_launch_template" "wordpress-ec2" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+data "aws_ami" "al2023" {
+  most_recent = true
+
+  filter {
+    name = "name"
+
+    values = [
+      "al2023-ami-*-x86_64",
+    ]
+  }
+
+  owners = [
+    "amazon",
+  ]
 }
 
 resource "aws_security_group" "wordpress-sg" {
