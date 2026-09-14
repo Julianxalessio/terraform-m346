@@ -3,21 +3,22 @@ resource "aws_launch_template" "wordpress-ec2" {
   image_id      = data.aws_ami.al2023.id
   instance_type = "t3.micro"
 
-  user_data= <<EOT
-    #!/bin/bash
-    # Update der Paketliste und Installation von Apache
-    sudo yum update -y
-    sudo yum install -y httpd
+  user_data = base64encode(<<EOT
+#!/bin/bash
+# Update der Paketliste und Installation von Apache
+sudo yum update -y
+sudo yum install -y httpd
 
-    # Starten des Apache-Webservers Test
-    sudo systemctl start httpd
+# Starten des Apache-Webservers
+sudo systemctl start httpd
 
-    # Aktivieren des Apache-Webservers beim Systemstart
-    sudo systemctl enable httpd
-                    
-    # Erstellen der "index.html"-Datei
-    echo "<html><head><title>Hello World</title></head><body><h1>Hello World</h1><p>This is a simple webpage served by Apache.</p></body></html>" | sudo tee /var/www/html/index.html >/dev/null
-  EOT
+# Aktivieren des Apache-Webservers beim Systemstart
+sudo systemctl enable httpd
+
+# Erstellen der "index.html"-Datei
+echo "<html><head><title>Hello World</title></head><body><h1>Hello World</h1><p>This is a simple webpage served by Apache.</p></body></html>" | sudo tee /var/www/html/index.html >/dev/null
+EOT
+  )
 
   network_interfaces {
     associate_public_ip_address = true
